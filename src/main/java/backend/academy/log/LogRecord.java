@@ -1,7 +1,9 @@
 package backend.academy.log;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +62,19 @@ public record LogRecord(String remoteAddress, String remoteUser, LocalDateTime t
         return stringStream.map(LogRecord::newLogRecord);
     }
 
+    public static class BodySizeInBytesComparator implements Comparator<LogRecord>, Serializable {
+        @Override
+        public int compare(LogRecord o1, LogRecord o2) {
+            if (o1.bodyBytesSent() == o2.bodyBytesSent()) {
+                return 0;
+            }
+            return (o1.bodyBytesSent() < o2.bodyBytesSent() ? -1 : 1);
+        }
+    }
+
     public record Request(String requestType, String requestSource, String requestHTTP) {
 
     }
+
+
 }

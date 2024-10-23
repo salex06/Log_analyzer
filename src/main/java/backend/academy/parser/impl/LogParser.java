@@ -19,9 +19,9 @@ public class LogParser implements Parser {
         List<String> files = new ArrayList<>();
         AtomicInteger requestsNumber = new AtomicInteger();
         AtomicLong requestSizeSum = new AtomicLong();
-        double percentile95 = 0;
         Map<String, Integer> requestedResources = new HashMap<>();
         Map<Short, Integer> responseCodes = new HashMap<>();
+        List<Integer> sizeInBytes = new ArrayList<>();
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
@@ -35,7 +35,8 @@ public class LogParser implements Parser {
                         filterResult = true;
                     }
                     return filterResult;
-                }).forEach(j -> {
+                }).sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
+                    sizeInBytes.add(j.bodyBytesSent());
                     requestsNumber.getAndIncrement();
                     requestSizeSum.getAndAdd(j.bodyBytesSent());
                     if (requestedResources.containsKey(j.request().requestSource())) {
@@ -58,8 +59,10 @@ public class LogParser implements Parser {
             toDate,
             requestsNumber.get(),
             (double) requestSizeSum.get() / requestsNumber.get(),
-            0,
+            sizeInBytes.get((int) (requestsNumber.get() * PERCENTILE)),
             requestedResources, responseCodes
         );
     }
+
+    private static final double PERCENTILE = 0.95;
 }
