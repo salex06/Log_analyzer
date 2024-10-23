@@ -2,6 +2,8 @@ package backend.academy.application.impl;
 
 import backend.academy.application.Application;
 import backend.academy.cliparams.CliParams;
+import backend.academy.format.Formatter;
+import backend.academy.format.impl.MarkdownFormatter;
 import backend.academy.log.LogReport;
 import backend.academy.parser.Parser;
 import backend.academy.parser.impl.LogParser;
@@ -20,6 +22,7 @@ public class AnalyzerApplication implements Application {
     private PathHandler pathHandler;
     private Parser logParser;
     private IOHandler ioHandler;
+    private Formatter formatter;
 
     public AnalyzerApplication() {
         ioHandler = new ConsoleIOHandler();
@@ -31,7 +34,7 @@ public class AnalyzerApplication implements Application {
         String filePath = cliParams.path();
         Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
         Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
-        //Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
+        Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
 
         if (filePath.startsWith("http")) {
             pathHandler = new URLPathHandler();
@@ -39,10 +42,14 @@ public class AnalyzerApplication implements Application {
             pathHandler = new LocalPathHandler();
         }
 
+        if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
+            formatter = new MarkdownFormatter();
+        }
+
         List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);
 
         LogReport logReport = logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null));
 
-        ioHandler.write(logReport.toString());
+        ioHandler.write(formatter.formatReport(logReport));
     }
 }
