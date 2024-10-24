@@ -2,10 +2,8 @@ package backend.academy.format.impl;
 
 import backend.academy.format.Formatter;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class AsciiDocFormatter implements Formatter {
-    private static final int COL_WIDTH = 10;
     public static final String TABLE_START_END = "|===";
 
     @Override
@@ -17,7 +15,6 @@ public class AsciiDocFormatter implements Formatter {
     public String formatTable(List<List<String>> table) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(TABLE_START_END).append('\n');
-        int tableWidth = table.getFirst().size();
         stringBuilder.append(formatRow(table.getFirst()));
         for (int i = 1; i < table.size(); ++i) {
             stringBuilder.append(formatRow(table.get(i)));
