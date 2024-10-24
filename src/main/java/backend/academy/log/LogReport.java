@@ -1,6 +1,7 @@
 package backend.academy.log;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,36 @@ public record LogReport(
     Map<String, Integer> requestedResources,
     Map<Short, Integer> responseCodes
 ) {
+
+    public List<List<String>> getResponseCodesAsTable() {
+        List<List<String>> table = new ArrayList<>();
+        table.add(List.of("Код", "Имя", "Всего"));
+        for (Map.Entry<Short, Integer> row : responseCodes.entrySet()) {
+            table.add(List.of(String.valueOf(row.getKey()), CODES.get(row.getKey()), String.valueOf(row.getValue())));
+        }
+        return table;
+    }
+
+    public List<List<String>> getResourcesAsTable() {
+        List<List<String>> table = new ArrayList<>();
+        table.add(List.of("Ресурс", "Количество"));
+        for (Map.Entry<String, Integer> row : requestedResources.entrySet()) {
+            table.add(List.of(row.getKey(), String.valueOf(row.getValue())));
+        }
+        return table;
+    }
+
+    public List<List<String>> getGeneralInfoAsTable() {
+        List<List<String>> table = new ArrayList<>();
+        table.add(List.of("Метрика", "Значение"));
+        table.add(List.of("Файл(-ы)", String.join(", ", files)));
+        table.add(List.of("Начальная дата", (fromDate() == null ? "-" : fromDate().toString())));
+        table.add(List.of("Конечная дата", (toDate() == null ? "-" : toDate().toString())));
+        table.add(List.of("Количество запросов", String.valueOf(requestsNumber)));
+        table.add(List.of("Средний размер ответа", String.valueOf((int) requestAverageSize)));
+        table.add(List.of("95p размера ответа", String.valueOf((int) percentile95)));
+        return table;
+    }
 
     @SuppressWarnings("checkstyle:magicnumber")
     public static final Map<Short, String> CODES = Map.<Short, String>ofEntries(
