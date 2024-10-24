@@ -2,7 +2,8 @@ package backend.academy.application.impl;
 
 import backend.academy.application.Application;
 import backend.academy.cliparams.CliParams;
-import backend.academy.format.Formatter;
+import backend.academy.format.FormatHandler;
+import backend.academy.format.impl.AsciiDocFormatter;
 import backend.academy.format.impl.MarkdownFormatter;
 import backend.academy.log.LogReport;
 import backend.academy.parser.Parser;
@@ -22,7 +23,7 @@ public class AnalyzerApplication implements Application {
     private PathHandler pathHandler;
     private Parser logParser;
     private IOHandler ioHandler;
-    private Formatter formatter;
+    private FormatHandler formatter;
 
     public AnalyzerApplication() {
         ioHandler = new ConsoleIOHandler();
@@ -43,7 +44,9 @@ public class AnalyzerApplication implements Application {
         }
 
         if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
-            formatter = new MarkdownFormatter();
+            formatter = new FormatHandler(new MarkdownFormatter());
+        } else {
+            formatter = new FormatHandler(new AsciiDocFormatter());
         }
 
         List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);
