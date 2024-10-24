@@ -1,71 +1,49 @@
 package backend.academy.format.impl;
 
 import backend.academy.format.Formatter;
-import backend.academy.log.LogReport;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 public class MarkdownFormatter implements Formatter {
     private static final int COL_WIDTH = 10;
 
     @Override
-    public String formatReport(LogReport logReport) {
+    public String formatTitle(String message) {
+        return "#### " + message + '\n';
+    }
+
+    @Override
+    public String formatTable(List<List<String>> table) {
         StringBuilder stringBuilder = new StringBuilder();
-        appendGeneralInformation(stringBuilder, logReport);
-        appendSourceInfo(stringBuilder, logReport);
-        appendResponceCodesInfo(stringBuilder, logReport);
+        int tableWidth = table.getFirst().size();
+        stringBuilder.append(formatRow(table.getFirst()));
+        stringBuilder.append(formatRow(
+            Stream.iterate((":" + "-".repeat(COL_WIDTH) + ":"), i -> (":" + "-".repeat(COL_WIDTH) + ":"))
+                .limit(tableWidth).toList()));
+        for (int i = 1; i < table.size(); ++i) {
+            stringBuilder.append(formatRow(table.get(i)));
+        }
         return stringBuilder.toString();
     }
 
-    private void appendResponceCodesInfo(StringBuilder stringBuilder, LogReport logReport) {
-        stringBuilder.append("#### Коды ответа\n");
-        addRow(stringBuilder, List.of("Код", "Имя", "Всего"));
-        addRow(stringBuilder, List.of(":" + "-".repeat(COL_WIDTH) + ":", ":" + "-".repeat(COL_WIDTH) + ":",
-            ":" + "-".repeat(COL_WIDTH) + ":"));
-        for (Map.Entry<Short, Integer> code : logReport.responseCodes().entrySet()) {
-            addRow(stringBuilder, List.of(String.valueOf(code.getKey()), LogReport.CODES.get(code.getKey()),
-                String.valueOf(code.getValue())));
-        }
-        stringBuilder.append('\n');
-    }
-
-    private void appendSourceInfo(StringBuilder stringBuilder, LogReport logReport) {
-        stringBuilder.append("#### Запрашиваемые ресурсы\n");
-        addRow(stringBuilder, List.of("Ресурс", "Количество"));
-        addRow(stringBuilder, List.of(":" + "-".repeat(COL_WIDTH) + ":", ":" + "-".repeat(COL_WIDTH) + ":"));
-        for (Map.Entry<String, Integer> resource : logReport.requestedResources().entrySet()) {
-            addRow(stringBuilder, List.of(resource.getKey(), String.valueOf(resource.getValue())));
-        }
-        stringBuilder.append('\n');
-    }
-
-    private void appendGeneralInformation(StringBuilder stringBuilder, LogReport logReport) {
-        stringBuilder.append("#### Общая информация\n");
-        addRow(stringBuilder, List.of("Метрика", "Значение"));
-        addRow(stringBuilder, List.of(":" + "-".repeat(COL_WIDTH) + ":", ":" + "-".repeat(COL_WIDTH) + ":"));
-        addRow(stringBuilder, List.of("Файл(-ы)", String.join(", ", logReport.files())));
-        addRow(stringBuilder,
-            List.of("Начальная дата", (logReport.fromDate() == null ? "-" : logReport.fromDate().toString())));
-        addRow(stringBuilder,
-            List.of("Конечная дата", (logReport.toDate() == null ? "-" : logReport.toDate().toString())));
-        addRow(stringBuilder, List.of("Количество запросов", String.valueOf(logReport.requestsNumber())));
-        addRow(stringBuilder, List.of("Средний размер ответа", String.valueOf((int) logReport.requestAverageSize())));
-        addRow(stringBuilder, List.of("95p размер ответа", String.valueOf((int) logReport.percentile95())));
-        stringBuilder.append('\n');
-    }
-
-    private void addRow(StringBuilder stringBuilder, List<String> strings) {
-        int colCount = strings.size();
+    @Override
+    public String formatRow(List<String> rowItems) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int colCount = rowItems.size();
         for (int i = 0; i < colCount; i++) {
-            addCol(stringBuilder, strings.get(i), (i == colCount - 1));
+            stringBuilder.append(formatCell(rowItems.get(i), i, colCount));
         }
         stringBuilder.append('\n');
+        return stringBuilder.toString();
     }
 
-    private void addCol(StringBuilder stringBuilder, String string, boolean isLast) {
-        stringBuilder.append('|').append(string);
-        if (isLast) {
-            stringBuilder.append('|');
+    @Override
+    public String formatCell(String cellItem, int cellIndex, int tableWidth) {
+        String result = '|' + cellItem;
+        if (cellIndex == tableWidth - 1) {
+            result += '|';
         }
+        return result;
     }
+
 }
