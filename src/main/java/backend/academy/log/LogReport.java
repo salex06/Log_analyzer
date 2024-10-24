@@ -17,7 +17,7 @@ public record LogReport(
 ) {
 
     public List<List<String>> getResponseCodesAsTable() {
-        List<List<String>> table = new ArrayList<>();
+        List<List<String>> table = new ArrayList<>(responseCodes.size());
         table.add(List.of("Код", "Имя", "Всего"));
         for (Map.Entry<Short, Integer> row : responseCodes.entrySet()) {
             table.add(List.of(String.valueOf(row.getKey()), CODES.get(row.getKey()), String.valueOf(row.getValue())));
@@ -26,7 +26,7 @@ public record LogReport(
     }
 
     public List<List<String>> getResourcesAsTable() {
-        List<List<String>> table = new ArrayList<>();
+        List<List<String>> table = new ArrayList<>(requestedResources.size());
         table.add(List.of("Ресурс", "Количество"));
         for (Map.Entry<String, Integer> row : requestedResources.entrySet()) {
             table.add(List.of(row.getKey(), String.valueOf(row.getValue())));
