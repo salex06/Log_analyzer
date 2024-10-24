@@ -1,7 +1,13 @@
 package backend.academy.format;
 
-import backend.academy.log.LogReport;
+import java.util.List;
 
 public interface Formatter {
-    String formatReport(LogReport logReport);
+    String formatTitle(String message);
+
+    String formatTable(List<List<String>> table);
+
+    String formatRow(List<String> rowItems);
+
+    String formatCell(String cellItem, int cellIndex, int tableWidth);
 }
