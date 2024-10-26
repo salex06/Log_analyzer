@@ -59,7 +59,7 @@ public class CliParams {
             try {
                 return LocalDate.parse(s);
             } catch (DateTimeParseException e) {
-                throw new ParameterException("Data '2015-06-043' could not be parsed", e);
+                throw new ParameterException("Data " + s + " could not be parsed", e);
             }
         }
     }
