@@ -5,6 +5,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -28,7 +29,11 @@ public class CliParams {
     public static class StringToLocalDateTimeConverter implements IStringConverter<LocalDate> {
         @Override
         public LocalDate convert(String s) {
-            return LocalDate.parse(s);
+            try {
+                return LocalDate.parse(s);
+            } catch (DateTimeParseException e) {
+                throw new ParameterException("Data '2015-06-043' could not be parsed", e);
+            }
         }
     }
 
