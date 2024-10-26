@@ -9,6 +9,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * The class represents a log model
+ * that stores information about the request
+ *
+ * @param remoteAddress the IP address of the client making the request.
+ * @param remoteUser    HTTP Authenticated User. When the user's name is not set, this field shows -.
+ * @param timeLocal     local server time.
+ * @param request       Request record object. The request type, path and protocol.
+ * @param status        the server response code
+ * @param bodyBytesSent the size of server response in bytes.
+ * @param httpReferer   the URL of the referral.
+ * @param httpUserAgent the user agent of the client (web browser).
+ */
 public record LogRecord(String remoteAddress, String remoteUser, LocalDateTime timeLocal, Request request, short status,
                         int bodyBytesSent, String httpReferer, String httpUserAgent) {
 
@@ -21,6 +34,12 @@ public record LogRecord(String remoteAddress, String remoteUser, LocalDateTime t
     private static final byte HTTP_REFERER_GROUP_NUMBER = 7;
     private static final byte HTTP_USER_AGENT_GROUP_NUMBER = 8;
 
+    /**
+     * Creates new LogRecord instance by parsing given string
+     *
+     * @param log log in the form of a string
+     * @return {@code LogRecord} object
+     */
     public static LogRecord newLogRecord(String log) {
         Matcher matcher =
             Pattern.compile("^(.+) - ([^\\[]+) \\[(.+)\\] \"(.+)\" (\\d+) (\\d+) \"(.+)\" \"(.+)\"$")
@@ -58,11 +77,27 @@ public record LogRecord(String remoteAddress, String remoteUser, LocalDateTime t
         );
     }
 
+    /**
+     * Converts stream of logs in the form of strings to stream of LogRecord objects
+     *
+     * @param stringStream stream of logs in the form of strings
+     * @return {@code Stream<LogRecord>} - stream of LogRecord objects
+     */
     public static Stream<LogRecord> parseStringStreamToLogRecordStream(Stream<String> stringStream) {
         return stringStream.map(LogRecord::newLogRecord);
     }
 
+    /**
+     * The class provides the method to compare LogRecord objects by its body size
+     */
     public static class BodySizeInBytesComparator implements Comparator<LogRecord>, Serializable {
+        /**
+         * Compares LogRecord objects
+         *
+         * @param o1 the first object to be compared.
+         * @param o2 the second object to be compared.
+         * @return 0 if there are equal sizes, -1 if the first one is less than the second one, 1 otherwise
+         */
         @Override
         public int compare(LogRecord o1, LogRecord o2) {
             if (o1.bodyBytesSent() == o2.bodyBytesSent()) {
@@ -72,9 +107,15 @@ public record LogRecord(String remoteAddress, String remoteUser, LocalDateTime t
         }
     }
 
+    /**
+     * The class contains request information
+     *
+     * @param requestType   GET, POST, etc.
+     * @param requestSource the path to source
+     * @param requestHTTP   protocol
+     */
     public record Request(String requestType, String requestSource, String requestHTTP) {
 
     }
-
 
 }
