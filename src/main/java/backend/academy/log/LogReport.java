@@ -5,6 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The class presents a report on processed log files.
+ * The report contains statistics: general information (number of files, size, etc.),
+ * information about the requested resources, information about the server response
+ *
+ * @param files              processed log files
+ * @param fromDate           the earliest log file
+ * @param toDate             the latest log file
+ * @param requestsNumber     the number of requests
+ * @param requestAverageSize the average size of all the requests
+ * @param percentile95       95% of requests are smaller or equal in size, and 5% of requests are larger or equal
+ * @param requestedResources the storage of the requested resources
+ * @param responseCodes      server response storage
+ */
 public record LogReport(
     List<String> files,
     LocalDate fromDate,
@@ -16,6 +30,11 @@ public record LogReport(
     Map<Short, Integer> responseCodes
 ) {
 
+    /**
+     * Allows getting info about response codes in the form of a table
+     *
+     * @return table contains info about response codes
+     */
     public List<List<String>> getResponseCodesAsTable() {
         List<List<String>> table = new ArrayList<>(responseCodes.size());
         table.add(List.of("Код", "Имя", "Всего"));
@@ -25,6 +44,11 @@ public record LogReport(
         return table;
     }
 
+    /**
+     * Allows getting info about requested resources in the form of a table
+     *
+     * @return table contains info about requested resources
+     */
     public List<List<String>> getResourcesAsTable() {
         List<List<String>> table = new ArrayList<>(requestedResources.size());
         table.add(List.of("Ресурс", "Количество"));
@@ -34,6 +58,11 @@ public record LogReport(
         return table;
     }
 
+    /**
+     * Allows getting general info in the form of a table
+     *
+     * @return table contains general info
+     */
     public List<List<String>> getGeneralInfoAsTable() {
         List<List<String>> table = new ArrayList<>();
         table.add(List.of("Метрика", "Значение"));
@@ -46,6 +75,9 @@ public record LogReport(
         return table;
     }
 
+    /**
+     * Storage of HTTP codes and its names
+     */
     @SuppressWarnings("checkstyle:magicnumber")
     public static final Map<Short, String> CODES = Map.<Short, String>ofEntries(
         Map.entry((short) 100, "Continue"),
