@@ -45,12 +45,9 @@ public class LogParser implements Parser {
                     sizeInBytes.add(j.bodyBytesSent());
                     requestsNumber.getAndIncrement();
                     requestSizeSum.getAndAdd(j.bodyBytesSent());
-                    if (requestedResources.containsKey(j.request().requestSource())) {
-                        requestedResources.put(j.request().requestSource(),
-                            requestedResources.get(j.request().requestSource()) + 1);
-                    } else {
-                        requestedResources.put(j.request().requestSource(), 1);
-                    }
+                    String[] reqSourcePath = j.request().requestSource().split("/");
+                    String reqSourceKey = '/' + reqSourcePath[reqSourcePath.length - 1];
+                    requestedResources.merge(reqSourceKey, 1, Integer::sum);
                     if (responseCodes.containsKey(j.status())) {
                         responseCodes.put(j.status(), responseCodes.get(j.status()) + 1);
                     } else {
