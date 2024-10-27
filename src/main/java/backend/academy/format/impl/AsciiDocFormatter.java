@@ -26,8 +26,7 @@ public class AsciiDocFormatter implements Formatter {
         return stringBuilder.toString();
     }
 
-    @Override
-    public String formatRow(List<String> rowItems) {
+    private String formatRow(List<String> rowItems) {
         StringBuilder stringBuilder = new StringBuilder();
         int colCount = rowItems.size();
         for (int i = 0; i < colCount; i++) {
@@ -37,8 +36,7 @@ public class AsciiDocFormatter implements Formatter {
         return stringBuilder.toString();
     }
 
-    @Override
-    public String formatCell(String cellItem, int cellIndex, int tableWidth) {
+    private String formatCell(String cellItem, int cellIndex, int tableWidth) {
         return (cellIndex == tableWidth - 1 ? ">|" : "^|") + cellItem;
     }
 

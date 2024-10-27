@@ -22,22 +22,4 @@ public interface Formatter {
      * @return {@code String} - formatted table
      */
     String formatTable(List<List<String>> table);
-
-    /**
-     * Formats list of strings as a part of the table
-     *
-     * @param rowItems list of strings - parts of the table
-     * @return {@code String} - formatted row
-     */
-    String formatRow(List<String> rowItems);
-
-    /**
-     * Formats the string as a cell in the table
-     *
-     * @param cellItem   value of the cell
-     * @param cellIndex  index of the cell
-     * @param tableWidth width of the table
-     * @return {@code String} - formatted row
-     */
-    String formatCell(String cellItem, int cellIndex, int tableWidth);
 }

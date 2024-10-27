@@ -29,8 +29,7 @@ public class MarkdownFormatter implements Formatter {
         return stringBuilder.toString();
     }
 
-    @Override
-    public String formatRow(List<String> rowItems) {
+    private String formatRow(List<String> rowItems) {
         StringBuilder stringBuilder = new StringBuilder();
         int colCount = rowItems.size();
         for (int i = 0; i < colCount; i++) {
@@ -40,8 +39,7 @@ public class MarkdownFormatter implements Formatter {
         return stringBuilder.toString();
     }
 
-    @Override
-    public String formatCell(String cellItem, int cellIndex, int tableWidth) {
+    private String formatCell(String cellItem, int cellIndex, int tableWidth) {
         String result = '|' + cellItem;
         if (cellIndex == tableWidth - 1) {
             result += '|';
