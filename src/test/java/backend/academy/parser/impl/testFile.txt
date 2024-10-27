@@ -1,0 +1,5 @@
+217.168.17.5 - - [17/May/2015:08:05:34 +0000] "GET /downloads/product_1 HTTP/1.1" 200 490 "-" "Debian APT-HTTP/1.3 (0.8.10.3)"
+65.39.197.164 - - [29/May/2015:11:05:36 +0000] "GET /downloads/product_2 HTTP/1.1" 304 0 "-" "Debian APT-HTTP/1.3 (0.8.16~exp12ubuntu10.16)"
+54.164.207.85 - - [29/May/2015:11:05:50 +0000] "GET /downloads/product_2 HTTP/1.1" 200 85619205 "-" "Chef Client/11.6.2 (ruby-1.9.3-p448; ohai-6.18.0; x86_64-linux; +http://opscode.com)"
+216.46.173.126 - - [29/May/2015:12:05:18 +0000] "GET /downloads/product_1 HTTP/1.1" 404 319 "-" "Debian APT-HTTP/1.3 (0.8.16~exp12ubuntu10.22)"
+197.155.77.1 - - [31/May/2015:15:05:22 +0000] "GET /downloads/product_1 HTTP/1.1" 304 0 "-" "Debian APT-HTTP/1.3 (1.0.1ubuntu2)"
