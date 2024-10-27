@@ -6,11 +6,13 @@ import backend.academy.parser.Parser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,8 +25,8 @@ public class LogParser implements Parser {
         List<String> files = new ArrayList<>();
         AtomicInteger requestsNumber = new AtomicInteger();
         AtomicLong requestSizeSum = new AtomicLong();
-        Map<String, Integer> requestedResources = new HashMap<>();
-        Map<Short, Integer> responseCodes = new HashMap<>();
+        Map<String, Integer> requestedResources = new LinkedHashMap<>();
+        Map<Short, Integer> responseCodes = new LinkedHashMap<>();
         List<Integer> sizeInBytes = new ArrayList<>();
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
@@ -64,7 +66,12 @@ public class LogParser implements Parser {
             requestsNumber.get(),
             (double) requestSizeSum.get() / requestsNumber.get(),
             sizeInBytes.get((int) (requestsNumber.get() * PERCENTILE)),
-            requestedResources, responseCodes
+            requestedResources.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
+                    LinkedHashMap::new)),
+            responseCodes.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
+                    LinkedHashMap::new))
         );
     }
 
