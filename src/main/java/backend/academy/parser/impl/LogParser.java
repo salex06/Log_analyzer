@@ -13,6 +13,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+/**
+ * The class allows collecting statistics of the log files
+ * using Stream API to transform, filter and collect data
+ */
 public class LogParser implements Parser {
     @Override
     public LogReport parse(List<Map.Entry<String, Stream<String>>> logRecords, LocalDate fromDate, LocalDate toDate) {
