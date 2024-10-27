@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * The class contains method to handle the path in the local file system (on the device)
+ * and find log files using a special pattern
+ */
 public class LocalPathHandler implements PathHandler {
     @Override
     public List<Map.Entry<String, Stream<String>>> handlePath(String path) throws IOException {

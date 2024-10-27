@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * The class contains method to handle the path in the network
+ * and find log files using a URL
+ */
 public class URLPathHandler implements PathHandler {
     @Override
     public List<Map.Entry<String, Stream<String>>> handlePath(String path) throws Exception {
