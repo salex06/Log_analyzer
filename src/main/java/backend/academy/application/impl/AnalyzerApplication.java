@@ -19,6 +19,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * The class represents an application which analyze the log files
+ * and collect statistics about them
+ */
 public class AnalyzerApplication implements Application {
     private PathHandler pathHandler;
     private Parser logParser;
