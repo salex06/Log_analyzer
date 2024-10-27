@@ -5,6 +5,7 @@ import backend.academy.log.LogReport;
 import backend.academy.parser.Parser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -22,6 +23,8 @@ import java.util.stream.Stream;
 public class LogParser implements Parser {
     @Override
     public LogReport parse(List<Map.Entry<String, Stream<String>>> logRecords, LocalDate fromDate, LocalDate toDate) {
+        LocalTime endOfTheDay =
+            LocalTime.of(LocalTime.MAX.getHour(), LocalTime.MAX.getMinute(), LocalDateTime.MAX.getSecond());
         List<String> files = new ArrayList<>();
         AtomicInteger requestsNumber = new AtomicInteger();
         AtomicLong requestSizeSum = new AtomicLong();
@@ -37,8 +40,8 @@ public class LogParser implements Parser {
                     if (fromDate != null && current.isBefore(fromDate.atStartOfDay())) {
                         filterResult = false;
                     }
-                    if (toDate != null && current.isAfter(toDate.atStartOfDay())) {
-                        filterResult = true;
+                    if (toDate != null && current.isAfter(LocalDateTime.of(toDate, endOfTheDay))) {
+                        filterResult = false;
                     }
                     return filterResult;
                 }).sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
