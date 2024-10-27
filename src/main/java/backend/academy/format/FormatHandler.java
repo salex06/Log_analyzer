@@ -3,14 +3,29 @@ package backend.academy.format;
 import backend.academy.log.LogReport;
 import java.util.List;
 
+/**
+ * The class keeps an object of a formatting class type and
+ * provides method to format the report using the methods
+ * of the specified type of formatting
+ */
 public class FormatHandler {
     private final Formatter formatter;
     private StringBuilder formattedReport;
 
+    /**
+     * Parameterized constructor sets the formatter value to the formatter field
+     *
+     * @param formatter type of formatting
+     */
     public FormatHandler(Formatter formatter) {
         this.formatter = formatter;
     }
 
+    /**
+     * The method formats the report using the specified type of formatting
+     * @param logReport given log file report
+     * @return {@code String} - formatted report
+     */
     public String formatReport(LogReport logReport) {
         formattedReport = new StringBuilder();
         appendGeneralInformation(logReport);

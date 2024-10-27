@@ -3,6 +3,9 @@ package backend.academy.format.impl;
 import backend.academy.format.Formatter;
 import java.util.List;
 
+/**
+ * The class provides methods to format the data using adoc syntax
+ */
 public class AsciiDocFormatter implements Formatter {
     public static final String TABLE_START_END = "|===";
 
