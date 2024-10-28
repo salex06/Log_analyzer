@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 public class FormatHandler {
-    private static final Formatter DEFAULT_FORMATTER = new AsciiDocFormatter();
+    public static final Formatter DEFAULT_FORMATTER = new AsciiDocFormatter();
     private final Formatter formatter;
     private StringBuilder formattedReport;
 
