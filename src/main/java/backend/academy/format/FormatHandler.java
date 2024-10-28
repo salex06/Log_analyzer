@@ -1,5 +1,6 @@
 package backend.academy.format;
 
+import backend.academy.format.impl.AsciiDocFormatter;
 import backend.academy.log.LogReport;
 import java.util.List;
 import lombok.Getter;
@@ -11,8 +12,13 @@ import lombok.Getter;
  */
 @Getter
 public class FormatHandler {
+    private static final Formatter DEFAULT_FORMATTER = new AsciiDocFormatter();
     private final Formatter formatter;
     private StringBuilder formattedReport;
+
+    public FormatHandler() {
+        this.formatter = DEFAULT_FORMATTER;
+    }
 
     /**
      * Parameterized constructor sets the formatter value to the formatter field
