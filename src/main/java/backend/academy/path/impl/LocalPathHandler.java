@@ -20,16 +20,19 @@ import java.util.stream.Stream;
  * The class contains method to handle the path in the local file system (on the device)
  * and find log files using a special pattern
  */
+//glob:C:\backend_academy_2024_project_3-java-salex06\src\main\resources\**\subLogs_1\*.txt
 public class LocalPathHandler implements PathHandler {
     @Override
     public List<Map.Entry<String, Stream<String>>> handlePath(String path) throws IOException {
         List<Map.Entry<String, Stream<String>>> matchesList = new ArrayList<>();
-        Path rootDir = Path.of("C:\\backend_academy_2024_project_3-java-salex06\\src\\main\\resources");
+        String rootDir = "C:\\backend_academy_2024_project_3-java-salex06\\src\\main\\resources";
+        Path rootDirAsPath = Path.of(rootDir);
+        String fullPath = ("glob:" + rootDir + path).replace("\\", "\\\\");
         FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) throws IOException {
                 FileSystem fs = FileSystems.getDefault();
-                PathMatcher matcher = fs.getPathMatcher(path);
+                PathMatcher matcher = fs.getPathMatcher(fullPath);
                 Path name = file.getFileName();
                 if (matcher.matches(file.toAbsolutePath())) {
                     matchesList.add(Map.entry(name.toString(), Files.lines(file)));
@@ -37,7 +40,7 @@ public class LocalPathHandler implements PathHandler {
                 return FileVisitResult.CONTINUE;
             }
         };
-        Files.walkFileTree(rootDir, matcherVisitor);
+        Files.walkFileTree(rootDirAsPath, matcherVisitor);
         return matchesList;
     }
 }
