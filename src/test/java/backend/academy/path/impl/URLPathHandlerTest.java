@@ -3,7 +3,9 @@ package backend.academy.path.impl;
 import backend.academy.path.PathHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import java.net.URISyntaxException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class URLPathHandlerTest {
     private final PathHandler pathHandler = new URLPathHandler();
@@ -30,4 +32,12 @@ class URLPathHandlerTest {
         assertEquals(expected, actual);
     }
 
+
+    @Test
+    @DisplayName("Ensure handlePath throws an Exception if the path is incorrect")
+    void ensureMethodThrowsExceptionIfPathIncorrect(){
+        String path = "it is not url";
+
+        assertThrows(Exception.class, () -> pathHandler.handlePath(path));
+    }
 }
