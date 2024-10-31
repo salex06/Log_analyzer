@@ -57,6 +57,11 @@ public class AnalyzerApplication implements Application {
 
         List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);
 
+        if (logsFromPath.isEmpty()) {
+            ioHandler.write("Лог-файлы не найдены");
+            return;
+        }
+
         LogReport logReport = logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null));
 
         ioHandler.write(formatter.formatReport(logReport));
