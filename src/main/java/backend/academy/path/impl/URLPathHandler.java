@@ -16,6 +16,8 @@ import java.util.stream.Stream;
  * and find log files using a URL
  */
 public class URLPathHandler implements PathHandler {
+    private static final int OK = 200;
+
     @Override
     public List<Map.Entry<String, Stream<String>>> handlePath(String path) throws Exception {
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
@@ -25,6 +27,9 @@ public class URLPathHandler implements PathHandler {
                 .GET()
                 .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != OK) {
+                return List.of();
+            }
             return List.of(Map.entry(path, response.body().lines()));
 
         } catch (URISyntaxException | IOException | InterruptedException e) {
