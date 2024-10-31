@@ -21,17 +21,22 @@ import java.util.stream.Stream;
  * and find log files using a special pattern
  */
 public class LocalPathHandler implements PathHandler {
+
     @Override
     public List<Map.Entry<String, Stream<String>>> handlePath(String path) throws IOException {
         List<Map.Entry<String, Stream<String>>> matchesList = new ArrayList<>();
-        String rootDir = "C:\\backend_academy_2024_project_3-java-salex06\\src\\main\\resources\\";
+        String rootDir = FileSystems.getDefault().getPath(".").toAbsolutePath() + "/src/main/resources/";
         Path rootDirAsPath = Path.of(rootDir);
-        String fullPath = ("glob:" + rootDir + path).replace("\\", "\\\\");
+        String fullPath = ("glob:" + rootDir + path);
+
+        fullPath = fullPath.replace('\\', '/');
+
+        String finalFullPath = fullPath;
         FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) throws IOException {
                 FileSystem fs = FileSystems.getDefault();
-                PathMatcher matcher = fs.getPathMatcher(fullPath);
+                PathMatcher matcher = fs.getPathMatcher(finalFullPath);
                 Path name = file.getFileName();
                 if (matcher.matches(file.toAbsolutePath())) {
                     matchesList.add(Map.entry(name.toString(), Files.lines(file)));
