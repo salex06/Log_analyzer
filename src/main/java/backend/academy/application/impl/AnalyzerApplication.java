@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Getter;
 
 /**
  * The class represents an application which analyze the log files
  * and collect statistics about them
  */
+@Getter
 public class AnalyzerApplication implements Application {
     private PathHandler pathHandler;
     private Parser logParser;
