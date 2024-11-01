@@ -69,6 +69,11 @@ class FormatHandlerTest {
             |20:00 - 20:59|5600|
             |10:00 - 10:59|1312|
             |08:00 - 08:59|145|
+            #### Наибольшее количество запросов по пользователям
+            |Адрес пользователя|Количество запросов с адреса|
+            |:----------:|:----------:|
+            |41.57.211.225|14|
+            |123.30.122.240|13|
             """;
         String ansForAdoc = """
             ==== Общая информация
@@ -105,6 +110,12 @@ class FormatHandlerTest {
             ^|10:00 - 10:59 >|1312\s
             ^|08:00 - 08:59 >|145\s
             |===
+            ==== Наибольшее количество запросов по пользователям
+            |===
+            ^|Адрес пользователя >|Количество запросов с адреса\s
+            ^|41.57.211.225 >|14\s
+            ^|123.30.122.240 >|13\s
+            |===
             """;
         return List.of(
             Map.entry(new MarkdownFormatter(), ansForMarkdown),
@@ -137,6 +148,11 @@ class FormatHandlerTest {
         requestsByHour.put(10, 1312);
         requestsByHour.put(8, 145);
 
+        Map<String, Integer> requestsByRemoteAddress = new LinkedHashMap<>();
+        requestsByRemoteAddress.put("41.57.211.225", 14);
+        requestsByRemoteAddress.put("123.30.122.240", 13);
+
+
         LogReport logReport = new LogReport(
             List.of(
                 "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs"),
@@ -147,7 +163,8 @@ class FormatHandlerTest {
             1768,
             requestResources,
             responseCodes,
-            requestsByHour
+            requestsByHour,
+            requestsByRemoteAddress
         );
 
         String actual = formatHandler.formatReport(logReport);

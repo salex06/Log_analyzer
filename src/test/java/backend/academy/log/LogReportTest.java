@@ -20,18 +20,24 @@ class LogReportTest {
     private static final Map<String, Integer> expectedRequestedResources = new LinkedHashMap<>();
     private static final Map<Short, Integer> expectedResponseCodes = new LinkedHashMap<>();
     private static final Map<Integer, Integer> expectedRequestsNumberByHour = new LinkedHashMap<>();
+    private static final Map<String, Integer> expectedRequestsNumberByRemoteAddress = new LinkedHashMap<>();
 
     @BeforeAll
     static void setup() {
         expectedRequestedResources.put("/product_1", 1);
         expectedRequestedResources.put("/product_2", 2);
+
         expectedResponseCodes.put((short) 200, 1);
         expectedResponseCodes.put((short) 304, 1);
         expectedResponseCodes.put((short) 404, 1);
+
         expectedRequestsNumberByHour.put(11, 2);
         expectedRequestsNumberByHour.put(8, 1);
         expectedRequestsNumberByHour.put(12, 1);
         expectedRequestsNumberByHour.put(15, 1);
+
+        expectedRequestsNumberByRemoteAddress.put("123.45.32.200", 5);
+        expectedRequestsNumberByRemoteAddress.put("201.106.110.21", 3);
     }
 
     @Test
@@ -39,7 +45,7 @@ class LogReportTest {
     void ensureLogReportIsInitializedCorrectly() {
         LogReport actual = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
             expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
-            expectedRequestsNumberByHour);
+            expectedRequestsNumberByHour, expectedRequestsNumberByRemoteAddress);
 
         assertEquals(expectedFiles, actual.files());
         assertEquals(expectedFromDate, actual.fromDate());
@@ -64,7 +70,7 @@ class LogReportTest {
 
         LogReport logReport = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
             expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
-            expectedRequestsNumberByHour);
+            expectedRequestsNumberByHour, expectedRequestsNumberByRemoteAddress);
 
         List<List<String>> actual = logReport.getResponseCodesAsTable();
 
@@ -82,7 +88,7 @@ class LogReportTest {
 
         LogReport logReport = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
             expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
-            expectedRequestsNumberByHour);
+            expectedRequestsNumberByHour, expectedRequestsNumberByRemoteAddress);
 
         List<List<String>> actual = logReport.getResourcesAsTable();
 
@@ -104,7 +110,7 @@ class LogReportTest {
 
         LogReport logReport = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
             expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
-            expectedRequestsNumberByHour);
+            expectedRequestsNumberByHour, expectedRequestsNumberByRemoteAddress);
 
         List<List<String>> actual = logReport.getGeneralInfoAsTable();
 
@@ -124,10 +130,29 @@ class LogReportTest {
 
         LogReport logReport = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
             expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
-            expectedRequestsNumberByHour);
+            expectedRequestsNumberByHour, expectedRequestedResources);
 
         List<List<String>> actual = logReport.getRequestsNumberByHourAsTable();
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    @DisplayName("Ensure getRequestsNumberByRemoteAddressAsTable works correctly")
+    void ensureGetRequestsNumberByRemoteAddressAsTableWorks() {
+        List<List<String>> expected = List.of(
+            List.of("Адрес пользователя", "Количество запросов с адреса"),
+            List.of("123.45.32.200", "5"),
+            List.of("201.106.110.21", "3")
+        );
+
+        LogReport logReport = new LogReport(expectedFiles, expectedFromDate, expectedToDate, expectedRequestNumber,
+            expectedRequestAverageSize, expectedPercentile95, expectedRequestedResources, expectedResponseCodes,
+            expectedRequestsNumberByHour, expectedRequestsNumberByRemoteAddress);
+
+        List<List<String>> actual = logReport.getRequestsNumberByRemoteAddressAsTable();
+
+        assertEquals(expected, actual);
+    }
+
 }

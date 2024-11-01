@@ -34,6 +34,7 @@ public class LogParser implements Parser {
         Map<Short, Integer> responseCodes = new LinkedHashMap<>();
         DDSketch ddSketch = DDSketches.unboundedDense(RELATIVE_ACCURACY);
         Map<Integer, Integer> numberOfRequestsByHour = new LinkedHashMap<>();
+        Map<String, Integer> numberOfRequestsByRemoteAddress = new LinkedHashMap<>();
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
@@ -66,6 +67,9 @@ public class LogParser implements Parser {
 
                     int reqHour = j.timeLocal().getHour();
                     numberOfRequestsByHour.merge(reqHour, 1, Integer::sum);
+
+                    String remoteAddress = j.remoteAddress();
+                    numberOfRequestsByRemoteAddress.merge(remoteAddress, 1, Integer::sum);
                 });
             });
 
@@ -76,13 +80,21 @@ public class LogParser implements Parser {
             requestsNumber.get(),
             (double) requestSizeSum.get() / requestsNumber.get(),
             ddSketch.getValueAtQuantile(PERCENTILE_95),
-            requestedResources.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            requestedResources.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new)),
-            responseCodes.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            responseCodes.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new)),
-            numberOfRequestsByHour.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            numberOfRequestsByHour.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
+                    LinkedHashMap::new)),
+            numberOfRequestsByRemoteAddress.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .limit(REMOTE_ADDRESS_COUNT_LIMIT)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new))
         );
@@ -90,4 +102,5 @@ public class LogParser implements Parser {
 
     private static final double PERCENTILE_95 = 0.95;
     private static final double RELATIVE_ACCURACY = 0.01;
+    private static final int REMOTE_ADDRESS_COUNT_LIMIT = 5;
 }

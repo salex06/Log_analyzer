@@ -31,8 +31,23 @@ public record LogReport(
     double percentile95,
     Map<String, Integer> requestedResources,
     Map<Short, Integer> responseCodes,
-    Map<Integer, Integer> requestsNumberByHour
+    Map<Integer, Integer> requestsNumberByHour,
+    Map<String, Integer> requestsNumberByRemoteAddress
 ) {
+
+    /**
+     * Allow getting info about requests number by hours in the form of a table
+     *
+     * @return table contains info about requests number by hour
+     */
+    public List<List<String>> getRequestsNumberByRemoteAddressAsTable() {
+        List<List<String>> table = new ArrayList<>(requestsNumberByRemoteAddress.size());
+        table.add(List.of("Адрес пользователя", "Количество запросов с адреса"));
+        for (Map.Entry<String, Integer> row : requestsNumberByRemoteAddress.entrySet()) {
+            table.add(List.of(row.getKey(), row.getValue().toString()));
+        }
+        return table;
+    }
 
     /**
      * Allow getting info about requests number by hours in the form of a table
