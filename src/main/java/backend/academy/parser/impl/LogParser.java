@@ -33,6 +33,7 @@ public class LogParser implements Parser {
         Map<String, Integer> requestedResources = new LinkedHashMap<>();
         Map<Short, Integer> responseCodes = new LinkedHashMap<>();
         DDSketch ddSketch = DDSketches.unboundedDense(RELATIVE_ACCURACY);
+        Map<Integer, Integer> numberOfRequestsByHour = new LinkedHashMap<>();
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
@@ -48,16 +49,23 @@ public class LogParser implements Parser {
                     return filterResult;
                 }).sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
                     ddSketch.accept(j.bodyBytesSent());
+
                     requestsNumber.getAndIncrement();
+
                     requestSizeSum.getAndAdd(j.bodyBytesSent());
+
                     String[] reqSourcePath = j.request().requestSource().split("/");
                     String reqSourceKey = '/' + reqSourcePath[reqSourcePath.length - 1];
                     requestedResources.merge(reqSourceKey, 1, Integer::sum);
+
                     if (responseCodes.containsKey(j.status())) {
                         responseCodes.put(j.status(), responseCodes.get(j.status()) + 1);
                     } else {
                         responseCodes.put(j.status(), 1);
                     }
+
+                    int reqHour = j.timeLocal().getHour();
+                    numberOfRequestsByHour.merge(reqHour, 1, Integer::sum);
                 });
             });
 
@@ -72,6 +80,9 @@ public class LogParser implements Parser {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new)),
             responseCodes.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
+                    LinkedHashMap::new)),
+            numberOfRequestsByHour.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new))
         );

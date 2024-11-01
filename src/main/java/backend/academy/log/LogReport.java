@@ -1,6 +1,7 @@
 package backend.academy.log;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,15 +11,17 @@ import java.util.Map;
  * The report contains statistics: general information (number of files, size, etc.),
  * information about the requested resources, information about the server response
  *
- * @param files              processed log files
- * @param fromDate           the earliest log file
- * @param toDate             the latest log file
- * @param requestsNumber     the number of requests
- * @param requestAverageSize the average size of all the requests
- * @param percentile95       95% of requests are smaller or equal in size, and 5% of requests are larger or equal
- * @param requestedResources the storage of the requested resources
- * @param responseCodes      server response storage
+ * @param files                processed log files
+ * @param fromDate             the earliest log file
+ * @param toDate               the latest log file
+ * @param requestsNumber       the number of requests
+ * @param requestAverageSize   the average size of all the requests
+ * @param percentile95         95% of requests are smaller or equal in size, and 5% of requests are larger or equal
+ * @param requestedResources   the storage of the requested resources
+ * @param responseCodes        server response storage
+ * @param requestsNumberByHour the number of requests during certain hours
  */
+@SuppressWarnings("RecordComponentNumber")
 public record LogReport(
     List<String> files,
     LocalDate fromDate,
@@ -27,8 +30,22 @@ public record LogReport(
     double requestAverageSize,
     double percentile95,
     Map<String, Integer> requestedResources,
-    Map<Short, Integer> responseCodes
+    Map<Short, Integer> responseCodes,
+    Map<Integer, Integer> requestsNumberByHour
 ) {
+
+    public List<List<String>> getRequestsNumberByHourAsTable() {
+        List<List<String>> table = new ArrayList<>(responseCodes.size());
+        table.add(List.of("Часы", "Количество за час"));
+        for (Map.Entry<Integer, Integer> row : requestsNumberByHour.entrySet()) {
+            table.add(List.of(
+                LocalTime.of(row.getKey(), LocalTime.MIN.getMinute()).toString()
+                    + " - "
+                    + LocalTime.of(row.getKey(), LocalTime.MAX.getMinute()).toString(),
+                row.getValue().toString()));
+        }
+        return table;
+    }
 
     /**
      * Allows getting info about response codes in the form of a table

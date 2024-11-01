@@ -40,7 +40,14 @@ public class FormatHandler {
         appendGeneralInformation(logReport);
         appendSourceInfo(logReport);
         appendResponseCodesInfo(logReport);
+        appendRequestsNumberByHourInformation(logReport);
         return formattedReport.toString();
+    }
+
+    private void appendRequestsNumberByHourInformation(LogReport logReport) {
+        List<List<String>> requestsNumberByHour = logReport.getRequestsNumberByHourAsTable();
+        formattedReport.append(formatter.formatTitle("Количество запросов по часам"));
+        formattedReport.append(formatter.formatTable(requestsNumberByHour));
     }
 
     private void appendResponseCodesInfo(LogReport logReport) {
