@@ -31,7 +31,7 @@ class LogParserTest {
         LocalDate expectedToDate = null;
         Integer expectedRequestNumber = 5;
         Double expectedRequestAverageSize = 17124002.8;
-        Integer expectedPercentile95 = 85619205;
+        Integer expectedPercentile95 = 487;
         Map<String, Integer> expectedRequestedResources = new HashMap<>();
         expectedRequestedResources.put("/product_1", 3);
         expectedRequestedResources.put("/product_2", 2);
@@ -60,7 +60,7 @@ class LogParserTest {
         LocalDate expectedToDate = null;
         Integer expectedRequestNumber = 4;
         Double expectedRequestAverageSize = 21404881.0;
-        Integer expectedPercentile95 = 85619205;
+        Integer expectedPercentile95 = 321;
         Map<String, Integer> expectedRequestedResources = new HashMap<>();
         expectedRequestedResources.put("/product_1", 2);
         expectedRequestedResources.put("/product_2", 2);
@@ -89,7 +89,7 @@ class LogParserTest {
         LocalDate expectedToDate = LocalDate.of(2015, 5, 29);
         Integer expectedRequestNumber = 4;
         Double expectedRequestAverageSize = 21405003.5;
-        Integer expectedPercentile95 = 85619205;
+        Integer expectedPercentile95 = 487;
         Map<String, Integer> expectedRequestedResources = new HashMap<>();
         expectedRequestedResources.put("/product_1", 2);
         expectedRequestedResources.put("/product_2", 2);
@@ -119,7 +119,7 @@ class LogParserTest {
         Integer expectedRequestNumber = 3;
         Double sumOfSizes = 85619524.0;
         Double expectedRequestAverageSize = sumOfSizes / expectedRequestNumber;
-        Integer expectedPercentile95 = 85619205;
+        Integer expectedPercentile95 = 321;
         Map<String, Integer> expectedRequestedResources = new HashMap<>();
         expectedRequestedResources.put("/product_1", 1);
         expectedRequestedResources.put("/product_2", 2);

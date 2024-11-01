@@ -3,6 +3,8 @@ package backend.academy.parser.impl;
 import backend.academy.log.LogRecord;
 import backend.academy.log.LogReport;
 import backend.academy.parser.Parser;
+import com.datadoghq.sketch.ddsketch.DDSketch;
+import com.datadoghq.sketch.ddsketch.DDSketches;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,7 +32,7 @@ public class LogParser implements Parser {
         AtomicLong requestSizeSum = new AtomicLong();
         Map<String, Integer> requestedResources = new LinkedHashMap<>();
         Map<Short, Integer> responseCodes = new LinkedHashMap<>();
-        List<Integer> sizeInBytes = new ArrayList<>();
+        DDSketch ddSketch = DDSketches.unboundedDense(RELATIVE_ACCURACY);
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
@@ -45,7 +47,7 @@ public class LogParser implements Parser {
                     }
                     return filterResult;
                 }).sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
-                    sizeInBytes.add(j.bodyBytesSent());
+                    ddSketch.accept(j.bodyBytesSent());
                     requestsNumber.getAndIncrement();
                     requestSizeSum.getAndAdd(j.bodyBytesSent());
                     String[] reqSourcePath = j.request().requestSource().split("/");
@@ -65,7 +67,7 @@ public class LogParser implements Parser {
             toDate,
             requestsNumber.get(),
             (double) requestSizeSum.get() / requestsNumber.get(),
-            sizeInBytes.get((int) (requestsNumber.get() * PERCENTILE)),
+            ddSketch.getValueAtQuantile(PERCENTILE_95),
             requestedResources.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                     LinkedHashMap::new)),
@@ -75,5 +77,6 @@ public class LogParser implements Parser {
         );
     }
 
-    private static final double PERCENTILE = 0.95;
+    private static final double PERCENTILE_95 = 0.95;
+    private static final double RELATIVE_ACCURACY = 0.01;
 }
