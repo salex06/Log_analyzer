@@ -34,8 +34,13 @@ public record LogReport(
     Map<Integer, Integer> requestsNumberByHour
 ) {
 
+    /**
+     * Allow getting info about requests number by hours in the form of a table
+     *
+     * @return table contains info about requests number by hour
+     */
     public List<List<String>> getRequestsNumberByHourAsTable() {
-        List<List<String>> table = new ArrayList<>(responseCodes.size());
+        List<List<String>> table = new ArrayList<>(requestsNumberByHour.size());
         table.add(List.of("Часы", "Количество за час"));
         for (Map.Entry<Integer, Integer> row : requestsNumberByHour.entrySet()) {
             table.add(List.of(
