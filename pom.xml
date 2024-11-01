@@ -228,6 +228,13 @@
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Calculating the percentile -->
+        <dependency>
+            <groupId>com.datadoghq</groupId>
+            <artifactId>sketches-java</artifactId>
+            <version>0.8.3</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
