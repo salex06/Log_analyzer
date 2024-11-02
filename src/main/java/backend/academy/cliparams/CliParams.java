@@ -44,6 +44,31 @@ public class CliParams {
     private String fileFormat;
 
     /**
+     * The type of output (to the console or to the file)
+     */
+    @Parameter(names = "--output", description = "Output type (to the console or to the file)",
+        validateWith = OutputTypeValidator.class)
+    private String outputType;
+
+    /**
+     * The class provides the operation to check the input for correctness
+     */
+    public static class OutputTypeValidator implements IParameterValidator {
+        /**
+         * Check the output type for correctness
+         *
+         * @param name name of the flag (such as --output)
+         * @param val  the checked value passed after the flag
+         */
+        @Override
+        public void validate(String name, String val) {
+            if (!Objects.equals(val, "file") && !Objects.equals(val, "console")) {
+                throw new ParameterException(name + " must be 'file' or 'console'");
+            }
+        }
+    }
+
+    /**
      * The class provides the operation to convert the input from string into LocalDate object
      */
     public static class StringToLocalDateTimeConverter implements IStringConverter<LocalDate> {

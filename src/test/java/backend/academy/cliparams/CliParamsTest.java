@@ -97,4 +97,26 @@ class CliParamsTest {
         assertThrows(ParameterException.class, () -> JCommander.newBuilder().addObject(cliParams).build().parse(
             params));
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"file", "console"})
+    @DisplayName("Ensure the output type is initialized correctly")
+    void ensureOutputTypeIsInitializedCorrectly(String expected) {
+        String[] params = new String[] {"--path", "somePath/someFile.txt", "--output", expected};
+
+        JCommander.newBuilder().addObject(cliParams).build().parse(
+            params);
+
+        assertEquals(expected, cliParams.outputType());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"sdafas", " ", "-1", "0"})
+    @DisplayName("Ensure the wrong output type throws exception")
+    void ensureWrongOutputTypeThrowsException(String current) {
+        String[] params = new String[] {"--path", "somePath/someFile.txt", "--output", current};
+
+        assertThrows(ParameterException.class, () -> JCommander.newBuilder().addObject(cliParams).build().parse(
+            params));
+    }
 }
