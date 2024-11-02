@@ -119,4 +119,38 @@ class CliParamsTest {
         assertThrows(ParameterException.class, () -> JCommander.newBuilder().addObject(cliParams).build().parse(
             params));
     }
+
+    @Test
+    @DisplayName("Ensure --filter-field parameter without --filter-value throws exception")
+    void ensureFilterFieldWithoutFilterValueThrowsException() {
+        String[] params = new String[] {"--path", "somePath/someFile.txt", "--filter-field", "some field"};
+
+        assertThrows(ParameterException.class, () -> JCommander.newBuilder().addObject(cliParams).build().parse(
+            params));
+    }
+
+    @Test
+    @DisplayName("Ensure --filter-value parameter without --filter-field throws exception")
+    void ensureFilterValueWithoutFilterFieldThrowsException() {
+        String[] params = new String[] {"--path", "somePath/someFile.txt", "--filter-value", "some value"};
+
+        assertThrows(ParameterException.class, () -> JCommander.newBuilder().addObject(cliParams).build().parse(
+            params));
+    }
+
+    @Test
+    @DisplayName("Ensure --filter-value with --filter-field is initialized correctly")
+    void ensureFilterValueAndFilterFieldDoNotThrowException() {
+        String expectedField = "agent";
+        String expectedValue = "test";
+        String[] params =
+            new String[] {"--path", "somePath/someFile.txt", "--filter-field", expectedField, "--filter-value",
+                expectedValue};
+
+        JCommander.newBuilder().addObject(cliParams).build().parse(
+            params);
+
+        assertEquals(expectedField, cliParams.fieldName);
+        assertEquals(expectedValue, cliParams.fieldValue);
+    }
 }

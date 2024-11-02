@@ -1,11 +1,14 @@
 package backend.academy.cliparams;
 
 import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.IParametersValidator;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.Parameters;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -14,6 +17,7 @@ import lombok.Getter;
  * necessary flags and parameters for user input
  */
 @Getter
+@Parameters(parametersValidators = CliParams.ExtraFilteringValidator.class)
 public class CliParams {
     /**
      * The path to log files as a wildcard string
@@ -42,6 +46,12 @@ public class CliParams {
     @Parameter(names = "--format", description = "The format of the result (markdown or adoc)",
         validateWith = FileFormatValidator.class)
     private String fileFormat;
+
+    @Parameter(names = "--filter-field", description = "Additional filtering by a given field")
+    String fieldName;
+
+    @Parameter(names = "--filter-value", description = "Value for filtering")
+    String fieldValue;
 
     /**
      * The type of output (to the console or to the file)
@@ -102,6 +112,24 @@ public class CliParams {
         public void validate(String name, String val) {
             if (!Objects.equals(val, "adoc") && !Objects.equals(val, "markdown")) {
                 throw new ParameterException("Parameter " + name + " must be 'adoc' or 'markdown'");
+            }
+        }
+    }
+
+    public static class ExtraFilteringValidator implements IParametersValidator {
+        @Override
+        public void validate(Map<String, Object> map) throws ParameterException {
+            String fieldFlagName = "--filter-field";
+            String valueFlagName = "--filter-value";
+            if (map.get(fieldFlagName) != null && map.get(valueFlagName) == null) {
+                throw new ParameterException(
+                    "--filter-value was expected"
+                );
+            }
+            if (map.get(fieldFlagName) == null && map.get(valueFlagName) != null) {
+                throw new ParameterException(
+                    "--filter-field was expected"
+                );
             }
         }
     }
