@@ -50,7 +50,7 @@ public class CliParams {
     @Parameter(names = "--filter-field", description = "Additional filtering by a given field")
     String fieldName;
 
-    @Parameter(names = "--filter-value", description = "Value for filtering")
+    @Parameter(names = "--filter-value", description = "Value for filtering", converter = GlobToRegexConverter.class)
     String fieldValue;
 
     /**
@@ -116,7 +116,16 @@ public class CliParams {
         }
     }
 
+    /**
+     * The class provides the operation to check matching parameters --filter-field and --filter-value
+     */
     public static class ExtraFilteringValidator implements IParametersValidator {
+        /**
+         * Check matching parameters --filter-field and --filter-value
+         * (both parameters are not set or both are set)
+         *
+         * @param map dictionary of parameters
+         */
         @Override
         public void validate(Map<String, Object> map) throws ParameterException {
             String fieldFlagName = "--filter-field";
@@ -131,6 +140,35 @@ public class CliParams {
                     "--filter-field was expected"
                 );
             }
+        }
+    }
+
+    /**
+     * The class provides operation to convert glob string to regex
+     */
+    public static class GlobToRegexConverter implements IStringConverter<String> {
+        /**
+         * Convert glob to regex
+         *
+         * @param glob command line argument
+         * @return regular expression in the form of the string
+         */
+        @Override
+        public String convert(String glob) {
+            StringBuilder regex = new StringBuilder();
+            regex.append('^');
+            for (int i = 0; i < glob.length(); i++) {
+                char c = glob.charAt(i);
+                switch (c) {
+                    case '*' -> regex.append(".*");
+                    case '?' -> regex.append('.');
+                    case '.' -> regex.append("\\.");
+                    case '\\' -> regex.append("\\\\");
+                    default -> regex.append(c);
+                }
+            }
+            regex.append('$');
+            return regex.toString();
         }
     }
 }

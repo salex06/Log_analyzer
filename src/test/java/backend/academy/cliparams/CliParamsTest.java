@@ -141,16 +141,17 @@ class CliParamsTest {
     @Test
     @DisplayName("Ensure --filter-value with --filter-field is initialized correctly")
     void ensureFilterValueAndFilterFieldDoNotThrowException() {
-        String expectedField = "agent";
-        String expectedValue = "test";
+        String field = "agent";
+        String value = "test";
         String[] params =
-            new String[] {"--path", "somePath/someFile.txt", "--filter-field", expectedField, "--filter-value",
-                expectedValue};
+            new String[] {"--path", "somePath/someFile.txt", "--filter-field", field, "--filter-value",
+                value};
+        String expectedValue = "^test$";
 
         JCommander.newBuilder().addObject(cliParams).build().parse(
             params);
 
-        assertEquals(expectedField, cliParams.fieldName);
+        assertEquals(field, cliParams.fieldName);
         assertEquals(expectedValue, cliParams.fieldValue);
     }
 }
