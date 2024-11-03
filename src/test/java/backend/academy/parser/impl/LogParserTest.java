@@ -40,7 +40,7 @@ class LogParserTest {
         expectedResponseCodes.put((short) 304, 2);
         expectedResponseCodes.put((short) 404, 1);
 
-        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate);
+        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate, null, null);
 
         assertEquals(expectedFiles, actual.files());
         assertEquals(expectedFromDate, actual.fromDate());
@@ -69,7 +69,7 @@ class LogParserTest {
         expectedResponseCodes.put((short) 304, 2);
         expectedResponseCodes.put((short) 404, 1);
 
-        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate);
+        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate, null, null);
 
         assertEquals(expectedFiles, actual.files());
         assertEquals(expectedFromDate, actual.fromDate());
@@ -98,7 +98,7 @@ class LogParserTest {
         expectedResponseCodes.put((short) 304, 1);
         expectedResponseCodes.put((short) 404, 1);
 
-        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate);
+        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate, null, null);
 
         assertEquals(expectedFiles, actual.files());
         assertEquals(expectedFromDate, actual.fromDate());
@@ -128,7 +128,40 @@ class LogParserTest {
         expectedResponseCodes.put((short) 304, 1);
         expectedResponseCodes.put((short) 404, 1);
 
-        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate);
+        LogReport actual = logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate, null, null);
+
+        assertEquals(expectedFiles, actual.files());
+        assertEquals(expectedFromDate, actual.fromDate());
+        assertEquals(expectedToDate, actual.toDate());
+        assertEquals(expectedRequestNumber, actual.requestsNumber());
+        assertEquals(expectedRequestAverageSize, actual.requestAverageSize());
+        assertEquals(expectedPercentile95, (int) actual.percentile95());
+        assertEquals(expectedRequestedResources, actual.requestedResources());
+        assertEquals(expectedResponseCodes, actual.responseCodes());
+    }
+
+    @Test
+    @DisplayName("Ensure the parse method works correctly if there are filterField and filterValue flags")
+    void ensureParsingWorksCorrectlyIfThereAreFilterFieldAndValueFlags() {
+        List<String> expectedFiles = List.of("testFile.txt");
+        LocalDate expectedFromDate = null;
+        LocalDate expectedToDate = null;
+        String filterField = "agent";
+        String filterValue = "^Debian.*0\\.8.*$";
+        Integer expectedRequestNumber = 3;
+        Double sumOfSizes = 809.0;
+        Double expectedRequestAverageSize = sumOfSizes / expectedRequestNumber;
+        Integer expectedPercentile95 = 321;
+        Map<String, Integer> expectedRequestedResources = new HashMap<>();
+        expectedRequestedResources.put("/product_1", 2);
+        expectedRequestedResources.put("/product_2", 1);
+        Map<Short, Integer> expectedResponseCodes = new HashMap<>();
+        expectedResponseCodes.put((short) 200, 1);
+        expectedResponseCodes.put((short) 304, 1);
+        expectedResponseCodes.put((short) 404, 1);
+
+        LogReport actual =
+            logParser.parse(List.of(inputStream), expectedFromDate, expectedToDate, filterField, filterValue);
 
         assertEquals(expectedFiles, actual.files());
         assertEquals(expectedFromDate, actual.fromDate());

@@ -1,13 +1,12 @@
 package backend.academy.parser.impl;
 
+import backend.academy.filter.impl.LogFilter;
 import backend.academy.log.LogRecord;
 import backend.academy.log.LogReport;
 import backend.academy.parser.Parser;
 import com.datadoghq.sketch.ddsketch.DDSketch;
 import com.datadoghq.sketch.ddsketch.DDSketches;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -24,9 +23,10 @@ import java.util.stream.Stream;
  */
 public class LogParser implements Parser {
     @Override
-    public LogReport parse(List<Map.Entry<String, Stream<String>>> logRecords, LocalDate fromDate, LocalDate toDate) {
-        LocalTime endOfTheDay =
-            LocalTime.of(LocalTime.MAX.getHour(), LocalTime.MAX.getMinute(), LocalDateTime.MAX.getSecond());
+    public LogReport parse(
+        List<Map.Entry<String, Stream<String>>> logRecords, LocalDate fromDate, LocalDate toDate,
+        String filterField, String filterValue
+    ) {
         List<String> files = new ArrayList<>();
         AtomicInteger requestsNumber = new AtomicInteger();
         AtomicLong requestSizeSum = new AtomicLong();
@@ -38,39 +38,31 @@ public class LogParser implements Parser {
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
-                i.getValue().filter(logRecord -> {
-                    LocalDateTime current = logRecord.timeLocal();
-                    boolean filterResult = true;
-                    if (fromDate != null && current.isBefore(fromDate.atStartOfDay())) {
-                        filterResult = false;
-                    }
-                    if (toDate != null && current.isAfter(LocalDateTime.of(toDate, endOfTheDay))) {
-                        filterResult = false;
-                    }
-                    return filterResult;
-                }).sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
-                    ddSketch.accept(j.bodyBytesSent());
+                i.getValue().filter(
+                        logRecord -> (new LogFilter().filter(logRecord, fromDate, toDate, filterField, filterValue)))
+                    .sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
+                        ddSketch.accept(j.bodyBytesSent());
 
-                    requestsNumber.getAndIncrement();
+                        requestsNumber.getAndIncrement();
 
-                    requestSizeSum.getAndAdd(j.bodyBytesSent());
+                        requestSizeSum.getAndAdd(j.bodyBytesSent());
 
-                    String[] reqSourcePath = j.request().requestSource().split("/");
-                    String reqSourceKey = '/' + reqSourcePath[reqSourcePath.length - 1];
-                    requestedResources.merge(reqSourceKey, 1, Integer::sum);
+                        String[] reqSourcePath = j.request().requestSource().split("/");
+                        String reqSourceKey = '/' + reqSourcePath[reqSourcePath.length - 1];
+                        requestedResources.merge(reqSourceKey, 1, Integer::sum);
 
-                    if (responseCodes.containsKey(j.status())) {
-                        responseCodes.put(j.status(), responseCodes.get(j.status()) + 1);
-                    } else {
-                        responseCodes.put(j.status(), 1);
-                    }
+                        if (responseCodes.containsKey(j.status())) {
+                            responseCodes.put(j.status(), responseCodes.get(j.status()) + 1);
+                        } else {
+                            responseCodes.put(j.status(), 1);
+                        }
 
-                    int reqHour = j.timeLocal().getHour();
-                    numberOfRequestsByHour.merge(reqHour, 1, Integer::sum);
+                        int reqHour = j.timeLocal().getHour();
+                        numberOfRequestsByHour.merge(reqHour, 1, Integer::sum);
 
-                    String remoteAddress = j.remoteAddress();
-                    numberOfRequestsByRemoteAddress.merge(remoteAddress, 1, Integer::sum);
-                });
+                        String remoteAddress = j.remoteAddress();
+                        numberOfRequestsByRemoteAddress.merge(remoteAddress, 1, Integer::sum);
+                    });
             });
 
         return new LogReport(

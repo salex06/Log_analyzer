@@ -42,6 +42,8 @@ public class AnalyzerApplication implements Application {
         Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
         Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
         Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
+        Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
+        Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
         if (filePath.startsWith("http")) {
             pathHandler = new URLPathHandler();
@@ -62,7 +64,9 @@ public class AnalyzerApplication implements Application {
             return;
         }
 
-        LogReport logReport = logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null));
+        LogReport logReport =
+            logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null),
+                filterField.orElse(null), filterValue.orElse(null));
 
         ioHandler.write(formatter.formatReport(logReport));
     }
