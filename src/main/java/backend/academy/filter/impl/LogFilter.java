@@ -21,7 +21,7 @@ public class LogFilter implements Filter {
         String filterValue
     ) {
         return checkDate(logRecord, fromDate, toDate)
-            && checkField(logRecord, FilterField.valueOf(filterField.toUpperCase()), filterValue);
+            && checkField(logRecord, filterField, filterValue);
     }
 
     private boolean checkDate(LogRecord logRecord, LocalDate fromDate, LocalDate toDate) {
@@ -38,10 +38,11 @@ public class LogFilter implements Filter {
         return filterResult;
     }
 
-    private boolean checkField(LogRecord logRecord, FilterField filterField, String filterValue) {
-        if (filterField == null || filterValue == null) {
+    private boolean checkField(LogRecord logRecord, String filterFieldAsString, String filterValue) {
+        if (filterFieldAsString == null || filterValue == null) {
             return true;
         }
+        FilterField filterField = FilterField.valueOf(filterFieldAsString.toUpperCase());
         Pattern filterValuePattern = Pattern.compile(filterValue);
         boolean filterFieldResult = true;
         switch (filterField) {
