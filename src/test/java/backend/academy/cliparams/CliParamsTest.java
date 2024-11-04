@@ -154,4 +154,14 @@ class CliParamsTest {
         assertEquals(field, cliParams.fieldName);
         assertEquals(expectedValue, cliParams.fieldValue);
     }
+
+    @Test
+    @DisplayName("Ensure absence of a parameter value causes an exception")
+    void ensureAbsenceOfParameterValueCausesException() {
+        String[] params =
+            new String[] {"--path", "--filter-field", "some_field"};
+
+        assertThrows(ParameterException.class,
+            () -> JCommander.newBuilder().addObject(cliParams).build().parse(params));
+    }
 }

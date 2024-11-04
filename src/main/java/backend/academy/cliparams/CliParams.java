@@ -17,53 +17,56 @@ import lombok.Getter;
  * necessary flags and parameters for user input
  */
 @Getter
-@Parameters(parametersValidators = CliParams.ExtraFilteringValidator.class)
+@Parameters(parametersValidators = {CliParams.ExtraFilteringValidator.class})
 public class CliParams {
     /**
      * The path to log files as a wildcard string
      * (supports URL path or Local file pattern)
      */
-    @Parameter(names = "--path", description = "Path to log-files", required = true)
+    @Parameter(names = "--path", description = "Path to log-files", required = true,
+        validateWith = EmptyValueValidator.class)
     private String path;
 
     /**
      * The earliest date for the log
      */
     @Parameter(names = "--from", converter = StringToLocalDateTimeConverter.class,
-        description = "The earliest date for log files")
+        description = "The earliest date for log files", validateWith = EmptyValueValidator.class)
     private LocalDate fromDate;
 
     /**
      * The latest date for the log
      */
     @Parameter(names = "--to", converter = StringToLocalDateTimeConverter.class,
-        description = "The latest date for log files")
+        description = "The latest date for log files", validateWith = EmptyValueValidator.class)
     private LocalDate toDate;
 
     /**
      * The type of output formatting (as markdown or adoc)
      */
     @Parameter(names = "--format", description = "The format of the result (markdown or adoc)",
-        validateWith = FileFormatValidator.class)
+        validateWith = {FileFormatValidator.class, EmptyValueValidator.class})
     private String fileFormat;
 
     /**
      * Additional filtering by a given field
      */
-    @Parameter(names = "--filter-field", description = "Additional filtering by a given field")
+    @Parameter(names = "--filter-field", description = "Additional filtering by a given field",
+        validateWith = EmptyValueValidator.class)
     String fieldName;
 
     /**
      * Value for filtering
      */
-    @Parameter(names = "--filter-value", description = "Value for filtering", converter = GlobToRegexConverter.class)
+    @Parameter(names = "--filter-value", description = "Value for filtering",
+        converter = GlobToRegexConverter.class, validateWith = EmptyValueValidator.class)
     String fieldValue;
 
     /**
      * The type of output (to the console or to the file)
      */
     @Parameter(names = "--output", description = "Output type (to the console or to the file)",
-        validateWith = OutputTypeValidator.class)
+        validateWith = {OutputTypeValidator.class, EmptyValueValidator.class})
     private String outputType;
 
     /**
@@ -175,6 +178,25 @@ public class CliParams {
             }
             regex.append('$');
             return regex.toString();
+        }
+    }
+
+    /**
+     * The class provides operation to check for the presence of the parameter value
+     * to prevent such a case: "--parameter1 --parameter2 parameter2_value"
+     */
+    public static class EmptyValueValidator implements IParameterValidator {
+        /**
+         * Check for the presence of the parameter value
+         *
+         * @param parameterName  name of the parameter
+         * @param parameterValue value of the parameter
+         */
+        @Override
+        public void validate(String parameterName, String parameterValue) throws ParameterException {
+            if (parameterValue.startsWith("--")) {
+                throw new ParameterException("The value of the " + parameterName + " flag was not passed");
+            }
         }
     }
 }
