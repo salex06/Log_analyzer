@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.Getter;
 
@@ -50,11 +51,14 @@ public class AnalyzerApplication implements Application {
         Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
         Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
-        if (filePath.startsWith("http")) {
-            pathHandler = new URLPathHandler();
-        } else {
-            pathHandler = new LocalPathHandler();
-        }
+            String urlPattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}"
+                + "\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
+
+            if (Pattern.compile(urlPattern).matcher(filePath).matches()) {
+                pathHandler = new URLPathHandler();
+            } else {
+                pathHandler = new LocalPathHandler();
+            }
 
         if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
             formatter = new FormatHandler(new MarkdownFormatter());
