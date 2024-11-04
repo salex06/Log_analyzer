@@ -36,6 +36,11 @@ public class AnalyzerApplication implements Application {
         logParser = new LogParser();
     }
 
+    public AnalyzerApplication(IOHandler ioHandler) {
+        this();
+        this.ioHandler = ioHandler;
+    }
+
     @Override
     public void run(CliParams cliParams) throws Exception {
         String filePath = cliParams.path();

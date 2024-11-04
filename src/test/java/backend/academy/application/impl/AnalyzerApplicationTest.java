@@ -5,7 +5,10 @@ import backend.academy.format.impl.AsciiDocFormatter;
 import backend.academy.format.impl.MarkdownFormatter;
 import backend.academy.path.impl.LocalPathHandler;
 import backend.academy.path.impl.URLPathHandler;
+import backend.academy.tools.IOHandler;
+import backend.academy.tools.impl.ConsoleIOHandler;
 import com.beust.jcommander.JCommander;
+import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,5 +55,35 @@ class AnalyzerApplicationTest {
 
         assertThat(analyzerApplication.formatter().formatter()).isInstanceOf(AsciiDocFormatter.class);
         assertThat(analyzerApplication.pathHandler()).isInstanceOf(LocalPathHandler.class);
+    }
+
+    @Test
+    @DisplayName("Ensure the run method will display a message about the absence of logs")
+    void ensureRunMethodDisplayMessageAboutAbsenceOfLogs() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IOHandler ioHandler = new ConsoleIOHandler(System.in, byteArrayOutputStream);
+        analyzerApplication = new AnalyzerApplication(ioHandler);
+        CliParams cliParams = new CliParams();
+        String[] params = {"--path", "wrong/**/*.txt"};
+        JCommander.newBuilder().addObject(cliParams).build().parse(params);
+
+        analyzerApplication.run(cliParams);
+
+        assertThat(byteArrayOutputStream.toString()).isEqualTo("Лог-файлы не найдены");
+    }
+
+    @Test
+    @DisplayName("Ensure the run method will display a message about the absence of suitable logs (after filtering)")
+    void ensureRunMethodDisplayMessageAboutAbsenceOfSuitableLogs() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IOHandler ioHandler = new ConsoleIOHandler(System.in, byteArrayOutputStream);
+        analyzerApplication = new AnalyzerApplication(ioHandler);
+        CliParams cliParams = new CliParams();
+        String[] params = {"--path", "logs/subLogs_1/30_12_20.txt", "--from", "2020-12-31"};
+        JCommander.newBuilder().addObject(cliParams).build().parse(params);
+
+        analyzerApplication.run(cliParams);
+
+        assertThat(byteArrayOutputStream.toString()).isEqualTo("Не найдены удовлетворяющие фильтрам записи");
     }
 }
