@@ -68,6 +68,10 @@ public class LogParser implements Parser {
                     });
             });
 
+        if (requestsNumber.get() == 0) {
+            return null;
+        }
+
         return new LogReport(
             files,
             fromDate,

@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class LogParserTest {
     private final Parser logParser = new LogParser();
@@ -171,5 +174,24 @@ class LogParserTest {
         assertEquals(expectedPercentile95, (int) actual.percentile95());
         assertEquals(expectedRequestedResources, actual.requestedResources());
         assertEquals(expectedResponseCodes, actual.responseCodes());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "2016, 10, 3, 2020, 7, 19, agent, Mozilla.*",
+        "2004, 10, 3, 2010, 7, 19, agent, Mozilla.*",
+        "2014, 10, 3, 2020, 7, 19, agent, Mazilla.*"
+    })
+    @DisplayName("Ensure the parse method returns null if there are no suitable logs")
+    void ensureParseMethodReturnsNullIfNoSuitableLogs(
+        int fromYear, int fromMonth, int fromDay, int toYear, int toMonth, int toDay, String field, String value
+    ) {
+        LocalDate fromDate = LocalDate.of(fromYear, fromMonth, fromDay);
+        LocalDate toDate = LocalDate.of(toYear, toMonth, toDay);
+
+        LogReport logReport =
+            logParser.parse(List.of(inputStream), fromDate, toDate, field, value);
+
+        assertNull(logReport);
     }
 }

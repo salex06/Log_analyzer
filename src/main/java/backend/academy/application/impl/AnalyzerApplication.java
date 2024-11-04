@@ -68,6 +68,10 @@ public class AnalyzerApplication implements Application {
             logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null),
                 filterField.orElse(null), filterValue.orElse(null));
 
-        ioHandler.write(formatter.formatReport(logReport));
+        if (logReport == null) {
+            ioHandler.write("Не найдены удовлетворяющие фильтрам записи");
+        } else {
+            ioHandler.write(formatter.formatReport(logReport));
+        }
     }
 }
