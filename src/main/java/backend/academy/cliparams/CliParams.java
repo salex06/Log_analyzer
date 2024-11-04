@@ -47,9 +47,15 @@ public class CliParams {
         validateWith = FileFormatValidator.class)
     private String fileFormat;
 
+    /**
+     * Additional filtering by a given field
+     */
     @Parameter(names = "--filter-field", description = "Additional filtering by a given field")
     String fieldName;
 
+    /**
+     * Value for filtering
+     */
     @Parameter(names = "--filter-value", description = "Value for filtering", converter = GlobToRegexConverter.class)
     String fieldValue;
 
