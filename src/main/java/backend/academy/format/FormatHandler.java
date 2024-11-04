@@ -46,9 +46,9 @@ public class FormatHandler {
     }
 
     private void appendRequestsNumberByRemoteAddress(LogReport logReport) {
-        List<List<String>> requestsNumberByHour = logReport.getRequestsNumberByRemoteAddressAsTable();
+        List<List<String>> requestsNumberByRemoteAddress = logReport.getRequestsNumberByRemoteAddressAsTable();
         formattedReport.append(formatter.formatTitle("Наибольшее количество запросов по пользователям"));
-        formattedReport.append(formatter.formatTable(requestsNumberByHour));
+        formattedReport.append(formatter.formatTable(requestsNumberByRemoteAddress));
     }
 
     private void appendRequestsNumberByHourInformation(LogReport logReport) {

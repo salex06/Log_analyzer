@@ -35,12 +35,15 @@ public class LogParser implements Parser {
         DDSketch ddSketch = DDSketches.unboundedDense(RELATIVE_ACCURACY);
         Map<Integer, Integer> numberOfRequestsByHour = new LinkedHashMap<>();
         Map<String, Integer> numberOfRequestsByRemoteAddress = new LinkedHashMap<>();
+
         logRecords.stream().map(i -> Map.entry(i.getKey(), LogRecord.parseStringStreamToLogRecordStream(i.getValue())))
             .forEach(i -> {
                 files.add(i.getKey());
-                i.getValue().filter(
+                i.getValue()
+                    .filter(
                         logRecord -> (new LogFilter().filter(logRecord, fromDate, toDate, filterField, filterValue)))
-                    .sorted(new LogRecord.BodySizeInBytesComparator()).forEach(j -> {
+                    .sorted(new LogRecord.BodySizeInBytesComparator())
+                    .forEach(j -> {
                         ddSketch.accept(j.bodyBytesSent());
 
                         requestsNumber.getAndIncrement();

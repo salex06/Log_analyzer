@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * The class provides methods to format the data using markdown syntax
+ * The class provides methods to format the data using Markdown syntax
  */
 public class MarkdownFormatter implements Formatter {
     private static final int COL_WIDTH = 10;
