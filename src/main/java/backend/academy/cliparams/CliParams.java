@@ -1,5 +1,6 @@
 package backend.academy.cliparams;
 
+import backend.academy.filter.impl.LogFilter;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IParametersValidator;
 import com.beust.jcommander.IStringConverter;
@@ -8,6 +9,8 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
@@ -52,7 +55,7 @@ public class CliParams {
      * Additional filtering by a given field
      */
     @Parameter(names = "--filter-field", description = "Additional filtering by a given field",
-        validateWith = EmptyValueValidator.class)
+        validateWith = {FieldNameValidator.class, EmptyValueValidator.class})
     String fieldName;
 
     /**
@@ -103,7 +106,9 @@ public class CliParams {
             try {
                 return LocalDate.parse(s);
             } catch (DateTimeParseException e) {
-                throw new ParameterException("Data " + s + " could not be parsed", e);
+                throw new ParameterException(
+                    "Data " + s + " could not be parsed (the string must match the pattern: YYYY-MM-DD)",
+                    e);
             }
         }
     }
@@ -199,4 +204,24 @@ public class CliParams {
             }
         }
     }
+
+    /**
+     * The class provides operation to check if filtering by this field is possible
+     */
+    public static class FieldNameValidator implements IParameterValidator {
+        /**
+         * Check the presence of this field in the FilterField enum of fields supported for filtering
+         *
+         * @param parameter name of the flag
+         * @param value     the value to be checked
+         */
+        @Override
+        public void validate(String parameter, String value) throws ParameterException {
+            List<String> filterFieldNames = Arrays.stream(LogFilter.FilterField.values()).map(Enum::name).toList();
+            if (!filterFieldNames.contains(value.toUpperCase())) {
+                throw new ParameterException("Filtering by '" + value + "' field is not supported");
+            }
+        }
+    }
 }
+

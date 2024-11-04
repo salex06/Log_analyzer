@@ -164,4 +164,15 @@ class CliParamsTest {
         assertThrows(ParameterException.class,
             () -> JCommander.newBuilder().addObject(cliParams).build().parse(params));
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "absd", "-", " "})
+    @DisplayName("Ensure wrong field names cause an exception")
+    void ensureWrongFieldNamesCauseException(String current) {
+        String[] params =
+            new String[] {"--path", "--filter-field", current, "--filter-value", "some_value"};
+
+        assertThrows(ParameterException.class,
+            () -> JCommander.newBuilder().addObject(cliParams).build().parse(params));
+    }
 }
