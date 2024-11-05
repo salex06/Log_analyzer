@@ -15,6 +15,8 @@ import backend.academy.tools.IOHandler;
 import backend.academy.tools.impl.IOHandlerImpl;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public class AnalyzerApplication implements Application {
             Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
             Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
             Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
+            Optional<String> outputFormat = Optional.ofNullable(cliParams.outputType());
             Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
             Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
@@ -64,10 +67,18 @@ public class AnalyzerApplication implements Application {
                 pathHandler = new LocalPathHandler();
             }
 
+            String defaultFileName;
             if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
                 formatter = new FormatHandler(new MarkdownFormatter());
+                defaultFileName = MarkdownFormatter.DEFAULT_FILE_NAME;
             } else {
                 formatter = new FormatHandler(new AsciiDocFormatter());
+                defaultFileName = AsciiDocFormatter.DEFAULT_FILE_NAME;
+            }
+
+            if (outputFormat.isPresent() && outputFormat.orElseThrow().equals(String.valueOf("file"))) {
+                ioHandler = new IOHandlerImpl(System.in,
+                    Files.newOutputStream(Path.of(IOHandlerImpl.PATH_TO_OUTPUT_FILE + defaultFileName)));
             }
 
             List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);

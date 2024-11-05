@@ -52,5 +52,6 @@ public class IOHandlerImpl implements IOHandler {
         return inputStream.nextLine();
     }
 
+    public static final String PATH_TO_OUTPUT_FILE = "src/main/resources/";
 }
 

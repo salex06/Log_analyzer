@@ -40,4 +40,5 @@ public class AsciiDocFormatter implements Formatter {
         return (cellIndex == tableWidth - 1 ? ">|" : "^|") + cellItem;
     }
 
+    public static final String DEFAULT_FILE_NAME = "output.adoc";
 }

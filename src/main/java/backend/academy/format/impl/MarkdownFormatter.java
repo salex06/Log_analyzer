@@ -47,4 +47,5 @@ public class MarkdownFormatter implements Formatter {
         return result;
     }
 
+    public static final String DEFAULT_FILE_NAME = "output.md";
 }
