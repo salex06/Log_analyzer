@@ -5,7 +5,7 @@ import backend.academy.format.impl.MarkdownFormatter;
 import backend.academy.path.impl.LocalPathHandler;
 import backend.academy.path.impl.URLPathHandler;
 import backend.academy.tools.IOHandler;
-import backend.academy.tools.impl.ConsoleIOHandler;
+import backend.academy.tools.impl.IOHandlerImpl;
 import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class AnalyzerApplicationTest {
     @DisplayName("Ensure the run method will display a message about the absence of logs")
     void ensureRunMethodDisplayMessageAboutAbsenceOfLogs() throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IOHandler ioHandler = new ConsoleIOHandler(System.in, byteArrayOutputStream);
+        IOHandler ioHandler = new IOHandlerImpl(System.in, byteArrayOutputStream);
         analyzerApplication = new AnalyzerApplication(ioHandler);
         String[] params = {"--path", "wrong/**/*.txt"};
 
@@ -68,7 +68,7 @@ class AnalyzerApplicationTest {
     @DisplayName("Ensure the run method will display a message about the absence of suitable logs (after filtering)")
     void ensureRunMethodDisplayMessageAboutAbsenceOfSuitableLogs() throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IOHandler ioHandler = new ConsoleIOHandler(System.in, byteArrayOutputStream);
+        IOHandler ioHandler = new IOHandlerImpl(System.in, byteArrayOutputStream);
         analyzerApplication = new AnalyzerApplication(ioHandler);
         String[] params = {"--path", "logs/subLogs_1/30_12_20.txt", "--from", "2020-12-31"};
 

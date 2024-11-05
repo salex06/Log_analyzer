@@ -12,7 +12,7 @@ import backend.academy.path.PathHandler;
 import backend.academy.path.impl.LocalPathHandler;
 import backend.academy.path.impl.URLPathHandler;
 import backend.academy.tools.IOHandler;
-import backend.academy.tools.impl.ConsoleIOHandler;
+import backend.academy.tools.impl.IOHandlerImpl;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.time.LocalDate;
@@ -35,7 +35,7 @@ public class AnalyzerApplication implements Application {
     private FormatHandler formatter;
 
     public AnalyzerApplication() {
-        ioHandler = new ConsoleIOHandler();
+        ioHandler = new IOHandlerImpl();
         logParser = new LogParser();
     }
 

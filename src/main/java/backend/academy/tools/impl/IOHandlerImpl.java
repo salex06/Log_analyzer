@@ -16,7 +16,7 @@ import lombok.Getter;
  * by the parameterized constructor.
  */
 @Getter
-public class ConsoleIOHandler implements IOHandler {
+public class IOHandlerImpl implements IOHandler {
     /**
      * A field containing a Scanner type object - input stream
      */
@@ -29,7 +29,7 @@ public class ConsoleIOHandler implements IOHandler {
     /**
      * Default constructor which sets a standard System.in and System.out streams
      */
-    public ConsoleIOHandler() {
+    public IOHandlerImpl() {
         inputStream = new Scanner(System.in, StandardCharsets.UTF_8);
         outputStream = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     }
@@ -39,7 +39,7 @@ public class ConsoleIOHandler implements IOHandler {
      * @param inputStream data reading stream
      * @param outputStream data writing stream
      */
-    public ConsoleIOHandler(InputStream inputStream, OutputStream outputStream) {
+    public IOHandlerImpl(InputStream inputStream, OutputStream outputStream) {
         this.inputStream = new Scanner(inputStream, StandardCharsets.UTF_8);
         this.outputStream = new PrintStream(outputStream, true, StandardCharsets.UTF_8);
     }
