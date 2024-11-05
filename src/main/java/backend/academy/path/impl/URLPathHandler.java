@@ -38,7 +38,7 @@ public class URLPathHandler implements PathHandler {
         }
     }
 
-    public static final Pattern urlPathPattern =
+    public static final Pattern URL_PATH_PATTERN =
         Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}"
             + "\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$");
 }

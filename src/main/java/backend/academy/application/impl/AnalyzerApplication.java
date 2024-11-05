@@ -58,7 +58,7 @@ public class AnalyzerApplication implements Application {
             Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
             Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
-            if (URLPathHandler.urlPathPattern.matcher(filePath).matches()) {
+            if (URLPathHandler.URL_PATH_PATTERN.matcher(filePath).matches()) {
                 pathHandler = new URLPathHandler();
             } else {
                 pathHandler = new LocalPathHandler();
