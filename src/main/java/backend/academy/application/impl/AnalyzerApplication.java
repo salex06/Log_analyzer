@@ -13,6 +13,7 @@ import backend.academy.path.impl.LocalPathHandler;
 import backend.academy.path.impl.URLPathHandler;
 import backend.academy.tools.IOHandler;
 import backend.academy.tools.impl.ConsoleIOHandler;
+import com.beust.jcommander.JCommander;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,12 @@ public class AnalyzerApplication implements Application {
     }
 
     @Override
-    public void run(CliParams cliParams) throws Exception {
+    public void run(String[] args) throws Exception {
         try {
+            CliParams cliParams = new CliParams();
+
+            JCommander.newBuilder().addObject(cliParams).build().parse(args);
+
             String filePath = cliParams.path();
             Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
             Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
