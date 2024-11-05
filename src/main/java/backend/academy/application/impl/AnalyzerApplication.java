@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The class represents an application which analyze the log files
@@ -44,12 +45,13 @@ public class AnalyzerApplication implements Application {
 
     @Override
     public void run(CliParams cliParams) throws Exception {
-        String filePath = cliParams.path();
-        Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
-        Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
-        Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
-        Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
-        Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
+        try {
+            String filePath = cliParams.path();
+            Optional<LocalDate> fromDate = Optional.ofNullable(cliParams.fromDate());
+            Optional<LocalDate> toDate = Optional.ofNullable(cliParams.toDate());
+            Optional<String> fileFormat = Optional.ofNullable(cliParams.fileFormat());
+            Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
+            Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
             String urlPattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}"
                 + "\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
@@ -60,27 +62,36 @@ public class AnalyzerApplication implements Application {
                 pathHandler = new LocalPathHandler();
             }
 
-        if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
-            formatter = new FormatHandler(new MarkdownFormatter());
-        } else {
-            formatter = new FormatHandler(new AsciiDocFormatter());
+            if (fileFormat.isPresent() && fileFormat.orElseThrow().equals(String.valueOf("markdown"))) {
+                formatter = new FormatHandler(new MarkdownFormatter());
+            } else {
+                formatter = new FormatHandler(new AsciiDocFormatter());
+            }
+
+            List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);
+
+            if (logsFromPath.isEmpty()) {
+                ioHandler.write("Лог-файлы не найдены");
+                return;
+            }
+
+            LogReport logReport =
+                logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null),
+                    filterField.orElse(null), filterValue.orElse(null));
+
+            if (logReport == null) {
+                ioHandler.write("Не найдены удовлетворяющие фильтрам записи");
+            } else {
+                ioHandler.write(formatter.formatReport(logReport));
+            }
+        } catch (IllegalArgumentException e) {
+            ioHandler.write("Ошибка: " + e.getMessage());
+            Logger.log.error("Error: {}", e, e.getCause());
         }
+    }
 
-        List<Map.Entry<String, Stream<String>>> logsFromPath = pathHandler.handlePath(filePath);
+    @Slf4j
+    private static class Logger {
 
-        if (logsFromPath.isEmpty()) {
-            ioHandler.write("Лог-файлы не найдены");
-            return;
-        }
-
-        LogReport logReport =
-            logParser.parse(logsFromPath, fromDate.orElse(null), toDate.orElse(null),
-                filterField.orElse(null), filterValue.orElse(null));
-
-        if (logReport == null) {
-            ioHandler.write("Не найдены удовлетворяющие фильтрам записи");
-        } else {
-            ioHandler.write(formatter.formatReport(logReport));
-        }
     }
 }
