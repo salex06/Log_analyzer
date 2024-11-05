@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +58,7 @@ public class AnalyzerApplication implements Application {
             Optional<String> filterField = Optional.ofNullable(cliParams.fieldName());
             Optional<String> filterValue = Optional.ofNullable(cliParams.fieldValue());
 
-            String urlPattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}"
-                + "\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
-
-            if (Pattern.compile(urlPattern).matcher(filePath).matches()) {
+            if (URLPathHandler.urlPathPattern.matcher(filePath).matches()) {
                 pathHandler = new URLPathHandler();
             } else {
                 pathHandler = new LocalPathHandler();

@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -36,4 +37,8 @@ public class URLPathHandler implements PathHandler {
             throw new Exception(e);
         }
     }
+
+    public static final Pattern urlPathPattern =
+        Pattern.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}"
+            + "\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$");
 }
