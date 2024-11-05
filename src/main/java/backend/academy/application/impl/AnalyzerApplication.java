@@ -14,6 +14,7 @@ import backend.academy.path.impl.URLPathHandler;
 import backend.academy.tools.IOHandler;
 import backend.academy.tools.impl.ConsoleIOHandler;
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -90,8 +91,11 @@ public class AnalyzerApplication implements Application {
                 ioHandler.write(formatter.formatReport(logReport));
             }
         } catch (IllegalArgumentException e) {
-            ioHandler.write("Ошибка: " + e.getMessage());
+            ioHandler.write("Ошибка: " + e.getMessage() + '\n');
             Logger.log.error("Error: {}", e, e.getCause());
+        } catch (ParameterException e) {
+            ioHandler.write("Ошибка параметров командной строки: " + e.getMessage() + '\n');
+            Logger.log.error("Error entering command line parameters: {}", e, e.getCause());
         }
     }
 

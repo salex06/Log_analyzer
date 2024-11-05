@@ -107,7 +107,7 @@ public class CliParams {
                 return LocalDate.parse(s);
             } catch (DateTimeParseException e) {
                 throw new ParameterException(
-                    "Data " + s + " could not be parsed (the string must match the pattern: YYYY-MM-DD)",
+                    "Date " + s + " could not be parsed (the string must match the pattern: YYYY-MM-DD)",
                     e);
             }
         }
